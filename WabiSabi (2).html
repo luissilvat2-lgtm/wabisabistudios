@@ -1,0 +1,491 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>WabiSabi</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Fredoka:wght@500;600;700&display=swap">
+<style id="css">
+/* Layout: banda de aviso, cabecera fija navy, hero con accesos por categoría, catálogo en cuadrícula, carrito lateral en 3 pasos, panel de edición solo para el dueño */
+:root{
+  --navy:#00145E; --amber:#FCBA00;
+  --bg:#F5F6FB; --surface:#FFFFFF; --fg:#0A1440; --muted:#59618A; --line:#DCE0F2;
+  --soft:#FFF3CC; --tile:#E9ECFA; --ok:#1B7A4B; --danger:#B3261E; --ring:#00145E;
+  --font-d:'Fredoka','Trebuchet MS',system-ui,sans-serif;
+  --font-b:'DM Sans',system-ui,-apple-system,'Segoe UI',sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#050B2B; --surface:#0C1745; --fg:#F3F4FF; --muted:#A5ACD8; --line:#1F2C6E;
+  --soft:#2A2A12; --tile:#16215A; --ok:#4CC38A; --danger:#FF8A80; --ring:#FCBA00; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#050B2B; --surface:#0C1745; --fg:#F3F4FF; --muted:#A5ACD8; --line:#1F2C6E;
+  --soft:#2A2A12; --tile:#16215A; --ok:#4CC38A; --danger:#FF8A80; --ring:#FCBA00; color-scheme:dark}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--fg);font:16px/1.5 var(--font-b);margin:0;-webkit-text-size-adjust:100%}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);background:var(--navy);z-index:60}
+h1,h2,h3{font-family:var(--font-d);line-height:1.1;margin:0;text-wrap:balance}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:3px solid var(--ring);outline-offset:2px}
+.in{max-width:1160px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:0;border-radius:999px;padding:12px 20px;font-weight:700;background:var(--amber);color:var(--navy);text-decoration:none;min-height:44px;transition:transform .12s}
+.btn:hover{transform:translateY(-1px)}
+.btn.ghost{background:transparent;color:inherit;border:2px solid currentColor}
+.btn.navy{background:var(--navy);color:#fff}
+.btn.sm{padding:8px 14px;min-height:36px;font-size:14px}
+.btn[disabled]{opacity:.5;cursor:not-allowed}
+.btn.wa{background:#25D366;color:#06301a}
+.bar{background:var(--amber);color:var(--navy);font-size:14px;font-weight:700;text-align:center;padding:8px 0}
+.hdr{position:sticky;top:env(safe-area-inset-top,0px);z-index:50;background:var(--navy);color:#fff}
+.hdr .in{display:flex;align-items:center;gap:14px;padding-block:8px;flex-wrap:wrap}
+.logo{height:46px;width:auto;display:block}
+.search{flex:1 1 220px;min-width:0;position:relative}
+.search input{width:100%;border:0;border-radius:999px;padding:11px 16px;background:#fff;color:#0A1440;min-height:44px}
+.cartbtn{position:relative;background:var(--amber);color:var(--navy);border:0;border-radius:999px;min-height:44px;padding:0 18px;font-weight:700;display:flex;align-items:center;gap:8px;margin-left:auto}
+.cartbtn .n{background:var(--navy);color:var(--amber);border-radius:999px;min-width:22px;height:22px;display:grid;place-items:center;font-size:13px;padding:0 6px}
+.hero{background:var(--navy);color:#fff;padding-block:40px 48px}
+.hero .in{display:grid;grid-template-columns:1.1fr .9fr;gap:32px;align-items:center}
+.hero h1{font-size:clamp(34px,6vw,60px);color:var(--amber);font-weight:700}
+.hero p{max-width:46ch;color:#D9DEFA;margin:16px 0 24px}
+.hero .cta{display:flex;gap:12px;flex-wrap:wrap}
+.tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.tile{background:rgba(255,255,255,.08);border:2px solid rgba(252,186,0,.55);border-radius:18px;color:#fff;padding:14px 8px;display:flex;flex-direction:column;align-items:center;gap:6px;font-weight:700;font-size:14px;text-align:center;min-width:0}
+.tile:hover{background:var(--amber);color:var(--navy)}
+.tile svg{width:38px;height:38px}
+.nav{position:sticky;top:calc(env(safe-area-inset-top,0px) + 62px);z-index:40;background:var(--bg);border-bottom:1px solid var(--line)}
+.chips{display:flex;gap:8px;overflow-x:auto;padding-block:12px;scrollbar-width:thin}
+.chip{flex:0 0 auto;border:2px solid var(--line);background:var(--surface);border-radius:999px;padding:8px 16px;font-weight:700;color:var(--fg);min-height:40px}
+.chip[aria-pressed=true]{background:var(--navy);border-color:var(--navy);color:var(--amber)}
+.sec{padding-block:28px}
+.sec h2{font-size:clamp(26px,4vw,36px);margin-bottom:6px}
+.sub{color:var(--muted);margin:0 0 20px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:16px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:18px;overflow:hidden;display:flex;flex-direction:column;min-width:0}
+.ph{aspect-ratio:1/1;max-width:100%;background:var(--tile);display:grid;place-items:center;position:relative;color:var(--navy)}
+:root[data-theme="dark"] .ph,:root:not([data-theme="light"]) .ph{}
+.ph img{width:100%;height:100%;object-fit:cover;display:block}
+.ph svg{width:46%;height:46%;color:var(--navy)}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .ph svg{color:var(--amber)}}
+:root[data-theme="dark"] .ph svg{color:var(--amber)}
+.badge{position:absolute;top:10px;left:10px;background:var(--amber);color:var(--navy);font-weight:700;font-size:12px;padding:4px 10px;border-radius:999px;text-transform:uppercase;letter-spacing:.04em}
+.cb{padding:14px;display:flex;flex-direction:column;gap:6px;flex:1}
+.cat{font-size:12px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:700}
+.card h3{font-size:19px}
+.desc{color:var(--muted);font-size:14px;margin:0;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.pr{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:auto;padding-top:8px;flex-wrap:wrap}
+.price{font-family:var(--font-d);font-size:24px;font-weight:700}
+.price small{display:block;font-family:var(--font-b);font-size:12px;color:var(--muted);font-weight:500}
+.empty{padding:40px 16px;text-align:center;color:var(--muted);border:2px dashed var(--line);border-radius:18px}
+.steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;list-style:none;padding:0;margin:0}
+.steps li{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:18px;min-width:0}
+.steps b{display:block;font-family:var(--font-d);font-size:20px;margin-bottom:4px}
+.steps span{color:var(--muted);font-size:15px}
+.foot{background:var(--navy);color:#D9DEFA;padding-block:32px;margin-top:24px}
+.foot .in{display:grid;grid-template-columns:auto 1fr;gap:24px;align-items:start}
+.foot h3{color:var(--amber);font-size:20px;margin-bottom:8px}
+.foot dl{margin:0;display:grid;grid-template-columns:auto 1fr;gap:4px 14px;font-size:15px}
+.foot dt{color:var(--amber);font-weight:700}
+.foot dd{margin:0;word-break:break-word;min-width:0}
+.foot a{color:#fff}
+.ov{position:fixed;inset:0;background:rgba(5,11,43,.6);z-index:70;display:flex;justify-content:flex-end}
+.panel{background:var(--bg);width:min(480px,100%);height:100%;display:flex;flex-direction:column;box-shadow:-8px 0 30px rgba(0,0,0,.3)}
+.ph1{background:var(--navy);color:#fff;padding:calc(14px + env(safe-area-inset-top,0px)) max(16px,env(safe-area-inset-right,0px)) 14px max(16px,env(safe-area-inset-left,0px));display:flex;align-items:center;gap:10px}
+.ph1 h2{font-size:22px;color:var(--amber);flex:1}
+.x{background:transparent;border:0;color:#fff;font-size:28px;line-height:1;min-width:44px;min-height:44px}
+.pb{flex:1;overflow:auto;padding:16px max(16px,env(safe-area-inset-right,0px)) 16px max(16px,env(safe-area-inset-left,0px));display:flex;flex-direction:column;gap:12px}
+.pf{border-top:1px solid var(--line);background:var(--surface);padding:12px max(16px,env(safe-area-inset-right,0px)) calc(12px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px));display:flex;flex-direction:column;gap:10px}
+.tot{display:flex;justify-content:space-between;align-items:baseline;font-weight:700;gap:10px}
+.tot b{font-family:var(--font-d);font-size:26px}
+.line{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:12px;display:flex;flex-direction:column;gap:8px}
+.line .top{display:flex;gap:10px;align-items:flex-start;justify-content:space-between}
+.line .nm{font-weight:700;min-width:0}
+.qty{display:inline-flex;align-items:center;border:2px solid var(--line);border-radius:999px}
+.qty button{border:0;background:transparent;width:36px;height:36px;font-size:20px;font-weight:700;border-radius:999px}
+.qty span{min-width:26px;text-align:center;font-weight:700}
+.fld{display:flex;flex-direction:column;gap:4px;font-weight:700;font-size:14px}
+.fld input,.fld textarea,.fld select{border:2px solid var(--line);background:var(--surface);border-radius:12px;padding:10px 12px;font-weight:400;min-height:44px;width:100%;min-width:0}
+.fld textarea{min-height:70px;resize:vertical}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.opts{display:flex;gap:10px;flex-wrap:wrap}
+.opts label{flex:1 1 140px;border:2px solid var(--line);border-radius:12px;padding:10px 12px;display:flex;gap:8px;align-items:center;font-weight:700;background:var(--surface)}
+.err{color:var(--danger);font-weight:700;font-size:14px;margin:0}
+.pm{background:var(--soft);border:2px solid var(--amber);border-radius:16px;padding:14px;display:flex;flex-direction:column;gap:8px}
+.pm h3{font-size:20px}
+.kv{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+.kv span{color:var(--muted);font-size:14px}
+.kv b{font-size:17px;word-break:break-all}
+.cp{border:2px solid var(--navy);background:transparent;color:var(--navy);border-radius:999px;padding:4px 12px;font-weight:700;font-size:13px;min-height:32px}
+:root[data-theme="dark"] .cp{color:var(--amber);border-color:var(--amber)}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .cp{color:var(--amber);border-color:var(--amber)}}
+.note{font-size:14px;color:var(--muted);margin:0}
+.ol{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:6px;font-size:15px}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(20px + env(safe-area-inset-bottom,0px));background:var(--navy);color:#fff;padding:10px 18px;border-radius:999px;z-index:200;font-weight:700;max-width:calc(100% - 32px);text-align:center;border:2px solid var(--amber)}
+.edit-fab{position:fixed;left:max(16px,env(safe-area-inset-left,0px));bottom:calc(16px + env(safe-area-inset-bottom,0px));z-index:55;box-shadow:0 6px 18px rgba(0,0,0,.35)}
+.dot{width:10px;height:10px;border-radius:50%;background:var(--danger);display:inline-block}
+.tabs{display:flex;gap:8px}
+.ap{background:var(--surface);border:1px solid var(--line);border-radius:14px;overflow:hidden}
+.ap>button.hd{width:100%;border:0;background:transparent;display:flex;align-items:center;gap:10px;padding:10px;text-align:left}
+.ap .th{width:46px;height:46px;border-radius:10px;background:var(--tile);overflow:hidden;display:grid;place-items:center;flex:0 0 auto;color:var(--navy)}
+.ap .th img{width:100%;height:100%;object-fit:cover}
+.ap .th svg{width:26px;height:26px}
+.ap .ti{flex:1;min-width:0;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ap .bd{padding:0 12px 12px;display:flex;flex-direction:column;gap:10px}
+.chk{display:flex;align-items:center;gap:8px;font-weight:700;font-size:14px}
+.hint{background:var(--soft);border-radius:12px;padding:10px 12px;font-size:14px}
+#loader{position:fixed;inset:0;background:var(--navy);z-index:1000;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;transition:opacity .45s}
+#loader.out{opacity:0;pointer-events:none}
+#loader img{width:min(240px,60vw);height:auto;animation:bob 1.1s ease-in-out infinite}
+#loader i{display:block;width:120px;height:6px;border-radius:6px;background:rgba(252,186,0,.25);overflow:hidden;position:relative}
+#loader i::after{content:"";position:absolute;inset:0;width:40%;background:var(--amber);border-radius:6px;animation:slide 1s ease-in-out infinite}
+@keyframes bob{0%,100%{transform:translateY(0) rotate(-2deg)}50%{transform:translateY(-12px) rotate(2deg)}}
+@keyframes slide{0%{left:-40%}100%{left:100%}}
+@media (prefers-reduced-motion:reduce){#loader img,#loader i::after{animation:none}html{scroll-behavior:auto}.btn:hover{transform:none}}
+@media (max-width:760px){
+  .hero .in{grid-template-columns:1fr}
+  .foot .in{grid-template-columns:1fr}
+  .nav{top:calc(env(safe-area-inset-top,0px) + 112px)}
+  .grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+  .cb{padding:10px}
+  .card h3{font-size:16px}
+  .price{font-size:20px}
+  .row2{grid-template-columns:1fr}
+}
+
+/* editor: secciones separadas y campos con más contraste */
+:root{--ico:#00145E;--field:#FFFFFF;--fline:#B7BFE3;--sect:#EEF0FA}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--ico:#FCBA00;--field:#16215F;--fline:#4A5BB0;--sect:#101B50}}
+:root[data-theme="dark"]{--ico:#FCBA00;--field:#16215F;--fline:#4A5BB0;--sect:#101B50}
+.panel .fld input,.panel .fld textarea,.panel .fld select,.panel input[data-cf]{background:var(--field);border:2px solid var(--fline)}
+.pb h3{font-size:13px;font-family:var(--font-b);text-transform:uppercase;letter-spacing:.09em;color:var(--muted);border-top:2px solid var(--line);padding-top:16px;margin-top:8px}
+.ap{border:2px solid var(--fline);border-radius:16px}
+.ap.open{border-color:var(--amber)}
+.ap>button.hd{padding:12px;gap:12px}
+.ap .th{color:var(--ico);border:1px solid var(--fline)}
+.ap .th.big{width:76px;height:76px}
+.ap .th.big svg{width:38px;height:38px}
+.ap .bd{padding:0;gap:0}
+.sc{padding:16px 14px;border-top:2px solid var(--line);display:flex;flex-direction:column;gap:12px;background:var(--surface)}
+.sc:nth-child(even){background:var(--sect)}
+.sc>h4{margin:0;font:700 12px/1 var(--font-b);letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.phrow{display:flex;gap:14px;align-items:center;flex-wrap:wrap}
+.phrow .fld{flex:1 1 180px;min-width:0}
+.sc .btns{display:flex;gap:10px;flex-wrap:wrap}
+.row2.keep{grid-template-columns:1fr 1fr}
+.ev{display:flex;flex-direction:column;gap:12px}
+.pb>*{flex-shrink:0}
+.ap>button.hd{min-height:72px}
+.ap .th{width:54px;height:54px}
+.ap .th svg{width:30px;height:30px}
+.ap .ti small{display:block;font-weight:400;font-size:13px;color:var(--muted);overflow:hidden;text-overflow:ellipsis}
+.ap .go{font-size:13px;font-weight:700;color:var(--ico);white-space:nowrap}
+</style>
+<div id="app"></div>
+<script type="application/json" id="store-data">{"settings":{"tasa":0,"rif":"","email":"wabizabistudios@gmail.com","tel":"+58 424-5754114","wa":"584245754114","pmBanco":"Mercantil (0105)","pmCedula":"31174530","pmTel":"0424-5754114","registro":"CRNE2023/23359","aviso":"Pago Móvil y confirmación por WhatsApp · Personalizamos a tu medida","auth":"223bd7b6121a1d27b6ad3b416a31bb76a7bc4e3aab6058e70f200b9e3961883c"},"categories":[{"id":"sub","name":"Sublimaciones","icon":"spark"},{"id":"est","name":"Estampados","icon":"shirt"},{"id":"taz","name":"Tazas","icon":"mug"},{"id":"llav","name":"Llaveros","icon":"key"},{"id":"arr","name":"Arreglos","icon":"gift"},{"id":"grad","name":"Paquetes de Grado","icon":"cap"}],"products":[{"id":"p01","name":"Taza blanca personalizada 11 oz","cat":"taz","price":5,"desc":"Taza de cerámica con tu diseño, foto o frase sublimada a todo color.","img":"data:image/jpeg;base64,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","badge":"Más pedida","stock":true},{"id":"p02","name":"Taza mágica","cat":"taz","price":8,"desc":"Cambia a tu diseño cuando le sirves algo caliente. Ideal para regalar.","img":"","badge":"","stock":true},{"id":"p03","name":"Taza con interior y asa de color","cat":"taz","price":6.5,"desc":"Interior y asa en el color que elijas, con tu diseño por fuera.","img":"","badge":"","stock":true},{"id":"p04","name":"Llavero acrílico personalizado","cat":"llav","price":3,"desc":"Llavero transparente con tu foto, nombre o logo impreso por ambos lados.","img":"","badge":"","stock":true},{"id":"p05","name":"Llavero MDF sublimado","cat":"llav","price":2.5,"desc":"Llavero ligero con diseño a color. Perfecto para recuerdos y eventos.","img":"","badge":"Nuevo","stock":true},{"id":"p06","name":"Franela estampada","cat":"est","price":9,"desc":"Franela con tu diseño estampado. Indica talla y color al agregar.","img":"","badge":"","stock":true},{"id":"p07","name":"Gorra estampada","cat":"est","price":7,"desc":"Gorra ajustable con tu logo o frase. Pedidos por mayor disponibles.","img":"","badge":"","stock":true},{"id":"p08","name":"Mouse pad personalizado","cat":"sub","price":5,"desc":"Mouse pad con tu imagen sublimada, base antideslizante.","img":"","badge":"","stock":true},{"id":"p09","name":"Cojín sublimado","cat":"sub","price":10,"desc":"Cojín con tu foto o diseño en funda sublimada.","img":"","badge":"","stock":true},{"id":"p10","name":"Termo personalizado","cat":"sub","price":14,"desc":"Termo con tu nombre o diseño sublimado. Consulta modelos disponibles.","img":"","badge":"","stock":true},{"id":"p11","name":"Arreglo de cumpleaños","cat":"arr","price":18,"desc":"Arreglo armado con detalles personalizados. Cuéntanos para quién es.","img":"","badge":"","stock":true},{"id":"p12","name":"Arreglo de aniversario","cat":"arr","price":22,"desc":"Detalles y mensajes personalizados para sorprender a tu pareja.","img":"","badge":"","stock":true},{"id":"p13","name":"Paquete de grado básico","cat":"grad","price":25,"desc":"Taza, llavero y detalle personalizado con tu nombre y promoción.","img":"","badge":"","stock":true},{"id":"p14","name":"Paquete de grado completo","cat":"grad","price":45,"desc":"Taza, llavero, franela y arreglo de grado con tu diseño.","img":"","badge":"Más pedido","stock":true}]}</script>
+<script id="code">
+(function(){
+"use strict";
+var LOGO="data:image/png;base64,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";
+var S=JSON.parse(document.getElementById('store-data').textContent);
+var ICONS={
+ mug:'<path d="M14 18h30v24a10 10 0 0 1-10 10H24a10 10 0 0 1-10-10z"/><path d="M44 24h5a6 6 0 0 1 0 14h-5"/><path d="M24 8c-2 3 2 4 0 7M33 8c-2 3 2 4 0 7"/>',
+ key:'<circle cx="22" cy="22" r="10"/><circle cx="22" cy="22" r="3"/><path d="M30 30l22 22M42 42l7-7M49 49l6-6"/>',
+ shirt:'<path d="M22 10L8 18l6 10 6-3v29h24V25l6 3 6-10-14-8c-2 5-6 7-10 7s-8-2-10-7z"/>',
+ spark:'<path d="M32 6l6 18 18 6-18 6-6 18-6-18-18-6 18-6z"/><path d="M52 8v8M48 12h8"/>',
+ gift:'<rect x="10" y="26" width="44" height="28" rx="3"/><path d="M8 18h48v8H8zM32 18v36"/><path d="M32 18c-4-10-14-10-14-4s10 4 14 4zM32 18c4-10 14-10 14-4s-10 4-14 4z"/>',
+ cap:'<path d="M32 14L6 26l26 12 26-12z"/><path d="M16 32v12c0 4 8 8 16 8s16-4 16-8V32M58 26v16"/>'
+};
+function icon(k){return '<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+(ICONS[k]||ICONS.gift)+'</svg>';}
+function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
+function money(n){return '$'+(Number(n)||0).toFixed(2).replace('.',',');}
+function bs(n){var t=Number(S.settings.tasa)||0;if(t<=0)return '';return (n*t).toLocaleString('es-VE',{minimumFractionDigits:2,maximumFractionDigits:2})+' Bs';}
+function uid(){return 'p'+Date.now().toString(36)+Math.random().toString(36).slice(2,6);}
+function byId(id){return S.products.filter(function(p){return p.id===id;})[0];}
+function catOf(id){return S.categories.filter(function(c){return c.id===id;})[0]||{name:'',icon:'gift'};}
+
+var ui={editId:null,login:false,loginErr:'',cat:'all',q:'',cartOpen:false,step:'cart',admin:false,tab:'prods',open:{},dirty:false,owner:false,delId:null,err:'',saving:false,code:''};
+var cust={name:'',phone:'',mode:'retiro',addr:'',note:''};
+var cart=[];
+try{cart=JSON.parse(localStorage.getItem('ws_cart')||'[]');}catch(e){cart=[];}
+function saveCart(){try{localStorage.setItem('ws_cart',JSON.stringify(cart));}catch(e){}}
+function cleanCart(){cart=cart.filter(function(i){var p=byId(i.id);return p&&p.stock!==false&&i.qty>0;});}
+function count(){return cart.reduce(function(a,i){return a+i.qty;},0);}
+function subtotal(){return cart.reduce(function(a,i){var p=byId(i.id);return a+(p?p.price*i.qty:0);},0);}
+
+/* pantalla de carga */
+var loader=document.createElement('div');loader.id='loader';
+loader.innerHTML='<img src="'+LOGO+'" alt="WabiSabi"><i></i>';
+document.body.appendChild(loader);
+var t0=Date.now();
+function hideLoader(){var w=Math.max(0,1700-(Date.now()-t0));setTimeout(function(){loader.classList.add('out');setTimeout(function(){loader.remove();},500);},w);}
+
+var root=document.getElementById('app');
+root.innerHTML='<div id="page"></div><div id="cartRoot"></div><div id="adminRoot"></div><div id="fab"></div><div id="toastRoot"></div>';
+var $page=document.getElementById('page'),$cart=document.getElementById('cartRoot'),$admin=document.getElementById('adminRoot'),$fab=document.getElementById('fab'),$toast=document.getElementById('toastRoot');
+
+var toastT;
+function toast(m){$toast.innerHTML='<div class="toast" role="status">'+esc(m)+'</div>';clearTimeout(toastT);toastT=setTimeout(function(){$toast.innerHTML='';},2600);}
+function lock(){document.body.style.overflow=(ui.cartOpen||ui.admin||ui.login)?'hidden':'';}
+
+function cardHTML(p){
+  var c=catOf(p.cat);var out=p.stock===false;
+  var im=p.img?'<img src="'+esc(p.img)+'" alt="'+esc(p.name)+'" loading="lazy">':icon(c.icon);
+  var b=out?'<span class="badge">Agotado</span>':(p.badge?'<span class="badge">'+esc(p.badge)+'</span>':'');
+  var bsv=bs(p.price);
+  return '<article class="card"><div class="ph">'+im+b+'</div><div class="cb"><span class="cat">'+esc(c.name)+'</span><h3>'+esc(p.name)+'</h3><p class="desc">'+esc(p.desc)+'</p><div class="pr"><div class="price">'+money(p.price)+(bsv?'<small>'+esc(bsv)+'</small>':'')+'</div><button class="btn sm" data-act="add" data-id="'+esc(p.id)+'"'+(out?' disabled':'')+'>'+(out?'Agotado':'Agregar')+'</button></div></div></article>';
+}
+function renderGrid(){
+  var q=ui.q.trim().toLowerCase();
+  var list=S.products.filter(function(p){
+    if(ui.cat!=='all'&&p.cat!==ui.cat)return false;
+    if(q&&(p.name+' '+p.desc+' '+catOf(p.cat).name).toLowerCase().indexOf(q)<0)return false;
+    return true;});
+  var g=document.getElementById('grid');if(!g)return;
+  g.innerHTML=list.length?list.map(cardHTML).join(''):'<div class="empty" style="grid-column:1/-1">No encontramos productos con esa búsqueda. Prueba con otra palabra o escríbenos por WhatsApp para pedirlo a medida.</div>';
+}
+function renderChips(){
+  var el=document.getElementById('chips');if(!el)return;
+  var h='<button class="chip" data-act="cat" data-id="all" aria-pressed="'+(ui.cat==='all')+'">Todo</button>';
+  S.categories.forEach(function(c){h+='<button class="chip" data-act="cat" data-id="'+esc(c.id)+'" aria-pressed="'+(ui.cat===c.id)+'">'+esc(c.name)+'</button>';});
+  el.innerHTML=h;
+}
+function updateBadge(){var n=document.getElementById('cartN');if(n)n.textContent=count();}
+
+function renderPage(){
+  var s=S.settings;
+  var tiles=S.categories.map(function(c){return '<button class="tile" data-act="cat" data-id="'+esc(c.id)+'" data-go="1">'+icon(c.icon)+'<span>'+esc(c.name)+'</span></button>';}).join('');
+  $page.innerHTML=
+  '<div class="bar"><div class="in">'+esc(s.aviso)+'</div></div>'+
+  '<header class="hdr"><div class="in"><a href="#top" aria-label="WabiSabi inicio"><img class="logo" src="'+LOGO+'" alt="WabiSabi"></a>'+
+    '<div class="search"><input id="q" type="search" placeholder="Buscar tazas, llaveros, paquetes…" aria-label="Buscar productos" value="'+esc(ui.q)+'"></div>'+
+    '<button class="cartbtn" data-act="opencart" aria-label="Abrir carrito">Carrito <span class="n" id="cartN">'+count()+'</span></button></div></header>'+
+  '<section class="hero" id="top"><div class="in"><div><h1>Sublimación y estampados hechos a tu medida</h1><p>Tazas, llaveros, franelas, arreglos y paquetes de grado personalizados. Elige, arma tu carrito, paga por Pago Móvil y confirma por WhatsApp.</p><div class="cta"><a class="btn" href="#catalogo">Ver productos</a><a class="btn ghost" href="https://wa.me/'+esc(s.wa)+'" target="_blank" rel="noopener">Pedir por WhatsApp</a></div></div><div class="tiles">'+tiles+'</div></div></section>'+
+  '<nav class="nav" aria-label="Categorías"><div class="in"><div class="chips" id="chips"></div></div></nav>'+
+  '<main class="sec" id="catalogo"><div class="in"><h2>Catálogo</h2><p class="sub">Precios en dólares. Agrega los detalles de tu diseño (nombres, fotos, colores, fechas) en el carrito.</p><div class="grid" id="grid"></div></div></main>'+
+  '<section class="sec"><div class="in"><h2>Cómo comprar</h2><p class="sub">Cuatro pasos, sin cuentas ni complicaciones.</p><ol class="steps"><li><b>Elige</b><span>Agrega al carrito lo que quieres personalizar.</span></li><li><b>Cuéntanos tu diseño</b><span>Escribe nombres, textos o colores en cada producto.</span></li><li><b>Paga por Pago Móvil</b><span>Te mostramos los datos y el monto exacto.</span></li><li><b>Envía el comprobante</b><span>Un toque y se abre WhatsApp con tu pedido listo.</span></li></ol></div></section>'+
+  '<footer class="foot"><div class="in"><img class="logo" style="height:64px" src="'+LOGO+'" alt="WabiSabi"><div><h3>Contacto</h3><dl>'+
+    (s.rif?'<dt>RIF</dt><dd>'+esc(s.rif)+'</dd>':'')+(s.registro?'<dt>Registro</dt><dd>Emprendimiento N° '+esc(s.registro)+'</dd>':'')+
+    '<dt>Correo</dt><dd>'+esc(s.email)+'</dd><dt>Teléfono</dt><dd>'+esc(s.tel)+'</dd><dt>WhatsApp</dt><dd><a href="https://wa.me/'+esc(s.wa)+'" target="_blank" rel="noopener">Escríbenos</a></dd></dl><button class="btn ghost sm" style="margin-top:14px;color:#fff" data-act="login">Acceso editor</button></div></div></footer>';
+  renderChips();renderGrid();
+}
+
+/* carrito */
+function renderCart(){
+  if(!ui.cartOpen){$cart.innerHTML='';lock();return;}
+  var s=S.settings,sub=subtotal(),bsv=bs(sub),title,body='',foot='';
+  if(ui.step==='cart'){
+    title='Tu carrito';
+    if(!cart.length){body='<div class="empty">Tu carrito está vacío. Agrega productos desde el catálogo.</div>';foot='<button class="btn" data-act="closecart">Seguir comprando</button>';}
+    else{
+      cart.forEach(function(i){var p=byId(i.id);if(!p)return;
+        body+='<div class="line"><div class="top"><div class="nm">'+esc(p.name)+'<div class="note">'+money(p.price)+' c/u</div></div><b>'+money(p.price*i.qty)+'</b></div><div class="top"><div class="qty"><button data-act="dec" data-id="'+esc(p.id)+'" aria-label="Quitar uno">−</button><span>'+i.qty+'</span><button data-act="inc" data-id="'+esc(p.id)+'" aria-label="Agregar uno">+</button></div><button class="btn ghost sm" data-act="rm" data-id="'+esc(p.id)+'">Quitar</button></div><label class="fld">Detalles del diseño<textarea data-note="'+esc(p.id)+'" placeholder="Nombre, texto, colores, fecha, foto a enviar…">'+esc(i.note||'')+'</textarea></label></div>';});
+      foot='<div class="tot"><span>Subtotal</span><span><b>'+money(sub)+'</b>'+(bsv?'<div class="note">≈ '+esc(bsv)+'</div>':'')+'</span></div><button class="btn" data-act="tostep" data-id="datos">Continuar</button>';
+    }
+  }else if(ui.step==='datos'){
+    title='Tus datos';
+    body='<label class="fld">Nombre y apellido<input data-c="name" autocomplete="name" value="'+esc(cust.name)+'"></label>'+
+      '<label class="fld">WhatsApp o teléfono<input data-c="phone" inputmode="tel" autocomplete="tel" placeholder="0424-0000000" value="'+esc(cust.phone)+'"></label>'+
+      '<div class="fld">Entrega<div class="opts"><label><input type="radio" name="mode" data-c="mode" value="retiro"'+(cust.mode==='retiro'?' checked':'')+'> Retiro</label><label><input type="radio" name="mode" data-c="mode" value="delivery"'+(cust.mode==='delivery'?' checked':'')+'> Delivery</label></div></div>'+
+      (cust.mode==='delivery'?'<label class="fld">Dirección de entrega<textarea data-c="addr" placeholder="Zona, calle, casa o edificio, punto de referencia">'+esc(cust.addr)+'</textarea></label>':'')+
+      '<label class="fld">Comentarios (opcional)<textarea data-c="note" placeholder="Fecha que lo necesitas, algo especial…">'+esc(cust.note)+'</textarea></label>'+
+      (ui.err?'<p class="err" role="alert">'+esc(ui.err)+'</p>':'');
+    foot='<button class="btn" data-act="topay">Ir a pagar</button><button class="btn ghost" data-act="tostep" data-id="cart">Volver al carrito</button>';
+  }else{
+    title='Pagar y confirmar';
+    var lines=cart.map(function(i){var p=byId(i.id);return p?'<div class="kv"><span>'+i.qty+' × '+esc(p.name)+'</span><b style="font-size:15px">'+money(p.price*i.qty)+'</b></div>':'';}).join('');
+    body='<div class="line"><b>Pedido '+esc(ui.code)+'</b>'+lines+'<div class="tot"><span>Total a pagar</span><span><b>'+money(sub)+'</b>'+(bsv?'<div class="note">≈ '+esc(bsv)+' (tasa '+esc(String(s.tasa).replace('.',','))+')</div>':'')+'</span></div></div>'+
+      '<div class="pm"><h3>Datos de Pago Móvil</h3>'+
+      '<div class="kv"><span>Banco</span><b>'+esc(s.pmBanco)+'</b><button class="cp" data-copy="'+esc(s.pmBanco)+'">Copiar</button></div>'+
+      '<div class="kv"><span>Cédula / RIF</span><b>'+esc(s.pmCedula)+'</b><button class="cp" data-copy="'+esc(s.pmCedula)+'">Copiar</button></div>'+
+      '<div class="kv"><span>Teléfono</span><b>'+esc(s.pmTel)+'</b><button class="cp" data-copy="'+esc(s.pmTel)+'">Copiar</button></div>'+
+      (bsv?'<div class="kv"><span>Monto en bolívares</span><b>'+esc(bsv)+'</b><button class="cp" data-copy="'+esc((sub*s.tasa).toFixed(2))+'">Copiar</button></div>':'')+'</div>'+
+      '<ol class="ol"><li>Haz el Pago Móvil por el monto de tu pedido.</li><li>Toma captura del comprobante.</li><li>Toca el botón verde: se abre WhatsApp con tu pedido escrito. Adjunta ahí la captura y envía.</li></ol>'+
+      '<p class="note">Tu pedido se confirma cuando recibimos el comprobante por WhatsApp.</p>';
+    foot='<a class="btn wa" href="'+esc(waLink())+'" target="_blank" rel="noopener">Enviar comprobante por WhatsApp</a><button class="btn ghost" data-act="tostep" data-id="datos">Volver</button><button class="btn ghost sm" data-act="clearcart">Pedido enviado, vaciar carrito</button>';
+  }
+  $cart.innerHTML='<div class="ov" data-act="ovcart"><section class="panel" role="dialog" aria-modal="true" aria-label="'+esc(title)+'"><div class="ph1"><h2>'+esc(title)+'</h2><button class="x" data-act="closecart" aria-label="Cerrar">×</button></div><div class="pb">'+body+'</div><div class="pf">'+foot+'</div></section></div>';
+  lock();
+}
+function waLink(){
+  var s=S.settings,sub=subtotal(),bsv=bs(sub);
+  var m='Hola WabiSabi, quiero confirmar mi pedido '+ui.code+'.\n\n';
+  cart.forEach(function(i){var p=byId(i.id);if(!p)return;m+='• '+i.qty+' x '+p.name+' ('+money(p.price*i.qty)+')'+(i.note?'\n   Detalles: '+i.note:'')+'\n';});
+  m+='\nTotal: '+money(sub)+(bsv?' / '+bsv:'')+'\nNombre: '+cust.name+'\nTeléfono: '+cust.phone+'\nEntrega: '+(cust.mode==='delivery'?'Delivery - '+cust.addr:'Retiro')+(cust.note?'\nComentarios: '+cust.note:'')+'\n\nAdjunto el comprobante de Pago Móvil.';
+  return 'https://wa.me/'+s.wa+'?text='+encodeURIComponent(m);
+}
+
+/* edición (solo dueño) */
+function markDirty(){ui.dirty=true;var d=document.getElementById('dirtyDot');if(d)d.hidden=false;renderFab();}
+function renderFab(){
+  if(!ui.owner){$fab.innerHTML='';return;}
+  $fab.innerHTML='<button class="btn navy edit-fab" data-act="openadmin">Editar tienda '+(ui.dirty?'<span class="dot" aria-label="Cambios sin publicar"></span>':'')+'</button>';
+}
+function pField(p,f,label,type,extra){return '<label class="fld">'+label+'<input data-pf="'+f+'" data-id="'+esc(p.id)+'" type="'+(type||'text')+'" value="'+esc(p[f])+'" '+(extra||'')+'></label>';}
+function editorView(p){
+  var c=catOf(p.cat);
+  return '<div class="ev"><button class="btn ghost sm" data-act="backlist" style="align-self:flex-start">← Volver a productos</button>'+
+  '<div class="ap open"><div class="sc" style="border-top:0"><h4>Lo principal</h4>'+pField(p,'name','Nombre')+
+  '<div class="row2 keep">'+pField(p,'price','Precio (USD)','number','min="0" step="0.01" inputmode="decimal"')+
+  '<label class="fld">Categoría<select data-pf="cat" data-id="'+esc(p.id)+'">'+S.categories.map(function(k){return '<option value="'+esc(k.id)+'"'+(k.id===p.cat?' selected':'')+'>'+esc(k.name)+'</option>';}).join('')+'</select></label></div>'+
+  '<label class="fld">Descripción<textarea rows="3" data-pf="desc" data-id="'+esc(p.id)+'">'+esc(p.desc)+'</textarea></label></div>'+
+  '<div class="sc"><h4>Foto y opciones</h4><div class="phrow"><span class="th big">'+(p.img?'<img src="'+esc(p.img)+'" alt="">':icon(c.icon))+'</span><label class="fld">Subir foto<input type="file" accept="image/*" data-img="'+esc(p.id)+'"></label></div>'+
+  (p.img?'<div class="btns"><button class="btn ghost sm" data-act="rmimg" data-id="'+esc(p.id)+'">Quitar foto</button></div>':'')+
+  pField(p,'badge','Etiqueta (ej. Nuevo, Más pedido)')+
+  '<label class="chk"><input type="checkbox" data-pf="stock" data-id="'+esc(p.id)+'"'+(p.stock!==false?' checked':'')+'> Disponible para la venta</label></div>'+
+  '<div class="sc"><div class="btns">'+(ui.delId===p.id?'<button class="btn navy sm" data-act="delp2" data-id="'+esc(p.id)+'">Sí, eliminar producto</button><button class="btn ghost sm" data-act="delp0">Cancelar</button>':'<button class="btn ghost sm" data-act="delp1" data-id="'+esc(p.id)+'">Eliminar producto</button>')+'</div></div></div></div>';
+}
+function renderAdmin(){
+  if(ui.login){
+    $admin.innerHTML='<div class="ov" style="justify-content:center;align-items:center"><section class="panel" style="height:auto;width:min(380px,calc(100% - 32px));border-radius:18px;overflow:hidden" role="dialog" aria-modal="true" aria-label="Acceso editor"><div class="ph1" style="padding-top:14px"><h2>Acceso editor</h2><button class="x" data-act="closelogin" aria-label="Cerrar">×</button></div><div class="pb"><label class="fld">Usuario<input id="lu" autocomplete="username" autocapitalize="none"></label><label class="fld">Clave<input id="lp" type="password" autocomplete="current-password"></label>'+(ui.loginErr?'<p class="err" role="alert">'+esc(ui.loginErr)+'</p>':'')+'</div><div class="pf"><button class="btn" data-act="dologin">Entrar</button></div></section></div>';
+    lock();var lu=document.getElementById('lu');if(lu)lu.focus();return;
+  }
+  if(!ui.admin){$admin.innerHTML='';lock();return;}
+  var oldPb=$admin.querySelector('.pb');var sc0=oldPb?oldPb.scrollTop:0;
+  var body='';
+  if(ui.tab==='prods'&&ui.editId&&byId(ui.editId)){
+    body+=editorView(byId(ui.editId));
+  }else if(ui.tab==='prods'){
+    body+='<div class="hint">Edita nombres, precios y fotos. Los cambios se ven en la tienda cuando tocas <b>Publicar cambios</b>.</div><button class="btn sm" data-act="addp">+ Nuevo producto</button>';
+    S.products.forEach(function(p){
+      var o=false;var c=catOf(p.cat);
+      body+='<div class="ap'+(o?' open':'')+'"><button class="hd" data-act="togp" data-id="'+esc(p.id)+'" aria-expanded="'+o+'"><span class="th">'+(p.img?'<img src="'+esc(p.img)+'" alt="">':icon(c.icon))+'</span><span class="ti">'+esc(p.name||'(sin nombre)')+'<small>'+esc(c.name)+(p.stock===false?' · Agotado':'')+'</small></span><b>'+money(p.price)+'</b><span class="go" aria-hidden="true">Editar ›</span></button>';
+      if(o){
+        body+='<div class="bd">'+
+        '<div class="sc"><h4>Datos básicos</h4>'+pField(p,'name','Nombre del producto')+
+        '<div class="row2">'+pField(p,'price','Precio (USD)','number','min="0" step="0.01" inputmode="decimal"')+
+        '<label class="fld">Categoría<select data-pf="cat" data-id="'+esc(p.id)+'">'+S.categories.map(function(k){return '<option value="'+esc(k.id)+'"'+(k.id===p.cat?' selected':'')+'>'+esc(k.name)+'</option>';}).join('')+'</select></label></div></div>'+
+        '<div class="sc"><h4>Descripción</h4><label class="fld">Texto que ve el cliente<textarea data-pf="desc" data-id="'+esc(p.id)+'">'+esc(p.desc)+'</textarea></label></div>'+
+        '<div class="sc"><h4>Foto</h4><div class="phrow"><span class="th big">'+(p.img?'<img src="'+esc(p.img)+'" alt="">':icon(c.icon))+'</span><label class="fld">Subir foto<input type="file" accept="image/*" data-img="'+esc(p.id)+'"></label></div>'+(p.img?'<div class="btns"><button class="btn ghost sm" data-act="rmimg" data-id="'+esc(p.id)+'">Quitar foto</button></div>':'')+'</div>'+
+        '<div class="sc"><h4>Opciones</h4>'+pField(p,'badge','Etiqueta (ej. Nuevo, Más pedido)')+
+        '<label class="chk"><input type="checkbox" data-pf="stock" data-id="'+esc(p.id)+'"'+(p.stock!==false?' checked':'')+'> Disponible para la venta</label></div>'+
+        '<div class="sc"><h4>Eliminar</h4><div class="btns">'+(ui.delId===p.id?'<button class="btn navy sm" data-act="delp2" data-id="'+esc(p.id)+'">Sí, eliminar producto</button><button class="btn ghost sm" data-act="delp0">Cancelar</button>':'<button class="btn ghost sm" data-act="delp1" data-id="'+esc(p.id)+'">Eliminar producto</button>')+'</div></div></div>';
+      }
+      body+='</div>';
+    });
+  }else{
+    var s=S.settings;
+    function sf(k,l,t,x){return '<label class="fld">'+l+'<input data-sf="'+k+'" type="'+(t||'text')+'" value="'+esc(s[k])+'" '+(x||'')+'></label>';}
+    body+='<div class="hint">Tasa en bolívares por dólar: si la dejas en 0 no se muestran montos en Bs.</div>'+
+    sf('tasa','Tasa del día (Bs por USD)','number','min="0" step="0.01" inputmode="decimal"')+sf('rif','RIF del negocio')+sf('registro','Registro de emprendimiento (N°)')+sf('email','Correo')+sf('tel','Teléfono (como se muestra)')+sf('wa','WhatsApp (solo números con código de país)','text','inputmode="numeric"')+
+    sf('aviso','Aviso de la barra superior')+'<h3>Acceso de edición</h3><label class="fld">Nuevo usuario<input id="nu" autocapitalize="none"></label><label class="fld">Nueva clave<input id="np" type="password"></label><button class="btn ghost sm" data-act="setauth">Cambiar acceso</button><h3>Pago Móvil</h3>'+sf('pmBanco','Banco')+sf('pmCedula','Cédula / RIF')+sf('pmTel','Teléfono')+
+    '<h3>Categorías</h3>'+S.categories.map(function(c){var used=S.products.some(function(p){return p.cat===c.id;});return '<div class="row2" style="grid-template-columns:1fr auto"><input data-cf="'+esc(c.id)+'" aria-label="Nombre de categoría" style="border:2px solid var(--line);background:var(--surface);border-radius:12px;padding:10px 12px;min-height:44px;min-width:0" value="'+esc(c.name)+'"><button class="btn ghost sm" data-act="delc" data-id="'+esc(c.id)+'"'+(used?' disabled title="Tiene productos"':'')+'>Quitar</button></div>';}).join('')+
+    '<button class="btn sm" data-act="addc">+ Nueva categoría</button>';
+  }
+  $admin.innerHTML='<div class="ov"><section class="panel" role="dialog" aria-modal="true" aria-label="Editar tienda"><div class="ph1"><h2>Editar tienda</h2><button class="x" data-act="closeadmin" aria-label="Cerrar">×</button></div><div class="pb"><div class="tabs"><button class="chip" data-act="tab" data-id="prods" aria-pressed="'+(ui.tab==='prods')+'">Productos</button><button class="chip" data-act="tab" data-id="sett" aria-pressed="'+(ui.tab==='sett')+'">Ajustes</button><button class="chip" data-act="logout">Cerrar sesión</button></div>'+body+'</div><div class="pf">'+(ui.err?'<p class="err" role="alert">'+esc(ui.err)+'</p>':'')+'<button class="btn" data-act="publish"'+(ui.saving?' disabled':'')+'>'+(ui.saving?'Publicando…':'Publicar cambios')+'</button><span class="note">Al publicar, la página se recarga con los cambios para todos.</span></div></section></div>';var nb=$admin.querySelector('.pb');if(nb)nb.scrollTop=sc0;
+  lock();
+}
+
+/* publicar: reconstruye la página completa a partir del estado */
+var RESET=':root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px system-ui,sans-serif}img{max-width:100%}[hidden]{display:none!important}';
+var TOP='<title>WabiSabi</title>\n<meta name="claude:viewport-fit-sides" content="cover">\n<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Fredoka:wght@500;600;700&display=swap">\n';
+function buildDoc(){
+  var css=document.getElementById('css').textContent;
+  var code=document.getElementById('code').textContent;
+  var data=JSON.stringify(S).replace(/</g,'\\u003c');
+  return '<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>'+RESET+'</style></head><body>'+TOP+'<style id="css">'+css+'</style>\n<div id="app"></div>\n<script type="application/json" id="store-data">'+data+'<\/script>\n<script id="code">'+code+'<\/script></body></html>';
+}
+async function publish(){
+  ui.err='';ui.saving=true;renderAdmin();
+  try{
+    var a=await window.claude.use('artifact');
+    if(!a){throw {code:'not_granted'};}
+    await a.publish(buildDoc());
+  }catch(e){
+    ui.saving=false;
+    var c=e&&e.code;
+    ui.err=(c==='not_writer'||c==='not_granted'||c==='not_declared')?'Esta vista no tiene permiso para guardar. Abre el enlace con la cuenta que creó la tienda.':(c==='conflict'?'Hubo otro cambio al mismo tiempo. La página se recargará con la última versión.':(c==='too_large'?'Las fotos pesan demasiado. Quita algunas o usa imágenes más pequeñas.':'No se pudo publicar. Intenta de nuevo en unos segundos.'));
+    renderAdmin();
+  }
+}
+function resizeImg(file,cb){
+  var r=new FileReader();
+  r.onload=function(){var im=new Image();im.onload=function(){
+    var max=600,k=Math.min(1,max/Math.max(im.width,im.height));
+    var cv=document.createElement('canvas');cv.width=Math.round(im.width*k);cv.height=Math.round(im.height*k);
+    var cx=cv.getContext('2d');cx.fillStyle='#fff';cx.fillRect(0,0,cv.width,cv.height);cx.drawImage(im,0,0,cv.width,cv.height);
+    cb(cv.toDataURL('image/jpeg',0.8));};im.onerror=function(){toast('No se pudo leer esa imagen');};im.src=r.result;};
+  r.readAsDataURL(file);
+}
+
+/* acceso al modo edición */
+async function sha(s){var b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(s));return Array.from(new Uint8Array(b)).map(function(x){return x.toString(16).padStart(2,'0');}).join('');}
+async function doLogin(){
+  var u=(document.getElementById('lu')||{}).value||'',p=(document.getElementById('lp')||{}).value||'';
+  try{
+    var h=await sha(u.trim().toLowerCase()+':'+p);
+    if(h===S.settings.auth){ui.owner=true;ui.login=false;ui.admin=true;ui.loginErr='';renderFab();renderAdmin();}
+    else{ui.loginErr='Usuario o clave incorrectos.';renderAdmin();}
+  }catch(e){ui.loginErr='Este navegador no pudo validar el acceso.';renderAdmin();}
+}
+async function setAuth(){
+  var u=((document.getElementById('nu')||{}).value||'').trim().toLowerCase(),p=(document.getElementById('np')||{}).value||'';
+  if(u.length<3||p.length<6){toast('Usuario de 3 o más letras y clave de 6 o más caracteres');return;}
+  try{S.settings.auth=await sha(u+':'+p);markDirty();toast('Acceso cambiado. Publica los cambios para guardarlo');}catch(e){toast('No se pudo cambiar el acceso');}
+}
+/* eventos */
+document.addEventListener('click',function(e){
+  var cp=e.target.closest('[data-copy]');
+  if(cp){var v=cp.getAttribute('data-copy');try{navigator.clipboard.writeText(v).then(function(){toast('Copiado: '+v);},function(){toast('Selecciona y copia: '+v);});}catch(x){toast('Selecciona y copia: '+v);}return;}
+  var el=e.target.closest('[data-act]');if(!el)return;
+  var act=el.getAttribute('data-act'),id=el.getAttribute('data-id');
+  if(act==='ovcart'){if(e.target!==el)return;act='closecart';}
+  switch(act){
+    case 'cat':ui.cat=id;renderChips();renderGrid();if(el.getAttribute('data-go')){var c=document.getElementById('catalogo');if(c)c.scrollIntoView({behavior:'smooth'});}break;
+    case 'add':{var p=byId(id);if(!p||p.stock===false)break;var f=cart.filter(function(i){return i.id===id;})[0];if(f)f.qty++;else cart.push({id:id,qty:1,note:''});saveCart();updateBadge();toast(p.name+' agregado al carrito');break;}
+    case 'opencart':cleanCart();ui.cartOpen=true;ui.step='cart';renderCart();break;
+    case 'closecart':ui.cartOpen=false;renderCart();break;
+    case 'inc':cart.forEach(function(i){if(i.id===id)i.qty++;});saveCart();updateBadge();renderCart();break;
+    case 'dec':cart.forEach(function(i){if(i.id===id)i.qty--;});cleanCart();saveCart();updateBadge();renderCart();break;
+    case 'rm':cart=cart.filter(function(i){return i.id!==id;});saveCart();updateBadge();renderCart();break;
+    case 'tostep':ui.step=id;ui.err='';renderCart();break;
+    case 'topay':{
+      var digits=cust.phone.replace(/\D/g,'');
+      if(cust.name.trim().length<3)ui.err='Escribe tu nombre y apellido.';
+      else if(digits.length<7)ui.err='Escribe un teléfono válido para contactarte.';
+      else if(cust.mode==='delivery'&&cust.addr.trim().length<8)ui.err='Escribe la dirección de entrega.';
+      else ui.err='';
+      if(ui.err){renderCart();break;}
+      ui.code='WS-'+Date.now().toString(36).slice(-5).toUpperCase();ui.step='pago';renderCart();break;}
+    case 'clearcart':cart=[];saveCart();updateBadge();ui.cartOpen=false;renderCart();toast('Carrito vaciado. ¡Gracias por tu compra!');break;
+    case 'openadmin':ui.admin=true;renderAdmin();break;
+    case 'closeadmin':ui.admin=false;renderAdmin();break;
+    case 'tab':ui.tab=id;renderAdmin();break;
+    case 'togp':ui.editId=id;ui.delId=null;renderAdmin();break;
+    case 'backlist':ui.editId=null;ui.delId=null;renderAdmin();break;
+    case 'addp':{var n={id:uid(),name:'Nuevo producto',cat:S.categories[0]?S.categories[0].id:'',price:1,desc:'',img:'',badge:'',stock:true};S.products.unshift(n);ui.editId=n.id;markDirty();renderAdmin();renderGrid();break;}
+    case 'delp1':ui.delId=id;renderAdmin();break;
+    case 'delp0':ui.delId=null;renderAdmin();break;
+    case 'delp2':S.products=S.products.filter(function(p){return p.id!==id;});ui.delId=null;ui.editId=null;cleanCart();saveCart();markDirty();renderAdmin();renderGrid();updateBadge();break;
+    case 'rmimg':{var q=byId(id);if(q)q.img='';markDirty();renderAdmin();renderGrid();break;}
+    case 'addc':S.categories.push({id:'c'+Date.now().toString(36),name:'Nueva categoría',icon:'gift'});markDirty();renderAdmin();renderPage();break;
+    case 'delc':S.categories=S.categories.filter(function(c){return c.id!==id;});if(ui.cat===id)ui.cat='all';markDirty();renderAdmin();renderPage();break;
+    case 'login':ui.login=true;ui.loginErr='';renderAdmin();break;
+    case 'closelogin':ui.login=false;renderAdmin();break;
+    case 'dologin':doLogin();break;
+    case 'logout':ui.owner=false;ui.admin=false;renderFab();renderAdmin();toast('Sesión cerrada');break;
+    case 'setauth':setAuth();break;
+    case 'publish':publish();break;
+  }
+});
+document.addEventListener('input',function(e){
+  var t=e.target;
+  if(t.id==='q'){ui.q=t.value;renderGrid();return;}
+  if(t.hasAttribute('data-c')&&t.type!=='radio'){cust[t.getAttribute('data-c')]=t.value;return;}
+  if(t.hasAttribute('data-note')){cart.forEach(function(i){if(i.id===t.getAttribute('data-note'))i.note=t.value;});saveCart();return;}
+  if(t.hasAttribute('data-pf')&&t.type!=='checkbox'&&t.tagName!=='SELECT'){var p=byId(t.getAttribute('data-id'));if(!p)return;var f=t.getAttribute('data-pf');p[f]=(f==='price')?(parseFloat(t.value)||0):t.value;markDirty();return;}
+  if(t.hasAttribute('data-sf')){var k=t.getAttribute('data-sf');S.settings[k]=(k==='tasa')?(parseFloat(t.value)||0):t.value;markDirty();return;}
+  if(t.hasAttribute('data-cf')){S.categories.forEach(function(c){if(c.id===t.getAttribute('data-cf'))c.name=t.value;});markDirty();return;}
+});
+document.addEventListener('change',function(e){
+  var t=e.target;
+  if(t.getAttribute('data-c')==='mode'){cust.mode=t.value;renderCart();return;}
+  if(t.hasAttribute('data-pf')){var p=byId(t.getAttribute('data-id'));if(p){var f=t.getAttribute('data-pf');if(f==='stock')p.stock=t.checked;else if(f==='cat')p.cat=t.value;markDirty();}renderGrid();renderAdmin();return;}
+  if(t.hasAttribute('data-img')&&t.files&&t.files[0]){var id=t.getAttribute('data-img');resizeImg(t.files[0],function(url){var p=byId(id);if(p){p.img=url;markDirty();renderAdmin();renderGrid();}});return;}
+  if(t.hasAttribute('data-sf')||t.hasAttribute('data-cf')){renderPage();renderAdmin();}
+});
+document.addEventListener('keydown',function(e){if(e.key==='Enter'&&(e.target.id==='lu'||e.target.id==='lp')){doLogin();return;}if(e.key==='Escape'){if(ui.login){ui.login=false;renderAdmin();}else if(ui.cartOpen){ui.cartOpen=false;renderCart();}else if(ui.admin){ui.admin=false;renderAdmin();}}});
+
+cleanCart();renderPage();renderCart();renderAdmin();renderFab();
+
+if(document.readyState==='complete')hideLoader();else window.addEventListener('load',hideLoader);
+setTimeout(function(){if(document.getElementById('loader'))hideLoader();},4000);
+})();
+</script>
+</body></html>
